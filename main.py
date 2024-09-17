@@ -5,6 +5,7 @@ from discord import Intents, Client, Message, utils
 from private import token
 from responses import get_response
 from copy import deepcopy
+from datetime import datetime
 
 # bot setup
 intents: Intents = Intents.default()
@@ -54,7 +55,21 @@ async def add_role(message: Message, roleName='member'):
         return 'You can not apply member role to users as you are not a executive'
 
 
+# messages every member - used to remined people of renewal
+async def renew():
+    if datetime.now().month != 9:
+        return 'It is not January, you dont wanna message everyone yet'
+    allUsers = client.get_all_members()
+    for user in allUsers:
+        print(user.name)
+        if user != client.user and await check_for_role(user, 'member') == True:
+            channel = await user.create_dm()
+            await channel.send('Hi,\nThis message has been automatically sent to all members to remined you that your membership to the UniSA Programming community automatically expires on the 1st of January. To continue to partipate in our events please renew it.\nThanks!\nhttps://usasa.sa.edu.au/clubs/join/7520/')
+    return 'All members have been reminded of there expiring membership '
+
 # finds the appropraite function to call based on the message content
+
+
 async def get_response(message: Message):
     message_content = message.content
     if message_content[0] != '!':
@@ -62,6 +77,8 @@ async def get_response(message: Message):
 
     if message_content.startswith('!member'):
         return await add_role(message)
+    if message_content.startswith('!spam'):
+        return await renew()
 
 
 # deals with recived messages
