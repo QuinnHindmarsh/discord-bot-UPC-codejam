@@ -1,5 +1,4 @@
-from discord import Intents, Client, Message, utils, guild
-from discord.ext.commands import context
+from discord import Intents, Client, Message, utils
 from private import token
 from responses import get_response
 from copy import deepcopy
@@ -11,25 +10,35 @@ intents.members = True  # NQQA
 
 client: Client = Client(intents=intents)
 
+# adds role to mentioned member
 
-def add_role(message: Message):
+
+async def add_role(message: Message, roleName='member'):
     UID = str(deepcopy(message.content))
     UID = UID.replace('!member ', '')
     UID = UID.replace('<@', '')
     UID = UID.replace('>', '')
-    print(UID)
-    return False
+    UID = int(UID)
+
+    role = utils.get(message.guild.roles, name=roleName)
+    target_member = utils.get(client.get_all_members(), id=UID)
+
+    await target_member.add_roles(role)
+    return f'Role has been succsesfully added to {target_member.name}'
+
+# finds the appropraite function to call based on the message content
 
 
-def get_response(message: Message):
+async def get_response(message: Message):
     message_content = message.content
     if message_content[0] != '!':
         return False
 
     if message_content.startswith('!member'):
-        return add_role(message)
+        return await add_role(message)
 
 
+# deals with recived messages
 async def send_message(message: Message) -> None:
     message_content = message.content
 
@@ -37,6 +46,11 @@ async def send_message(message: Message) -> None:
         print('user message is empty')
         return
 
+    response: str = await get_response(message)
+    if response != False:
+        await message.channel.send(response)
+
+"""
     try:
         response: str = get_response(message)
         if response != False:
@@ -44,16 +58,17 @@ async def send_message(message: Message) -> None:
 
     except Exception as e:
         print(e)
+"""
+
+# called on startup
 
 
-# startup
 @client.event
 async def on_ready():
     print(f'{client.user} is now running')
 
-# handling incoming messages
 
-
+# called when message is sent
 @client.event
 async def on_message(message: Message):
     if message.author == client.user:
@@ -62,7 +77,7 @@ async def on_message(message: Message):
     await send_message(message)
 
 
-# main
+#  Runs bot
 def main():
     client.run(token=token)
 
