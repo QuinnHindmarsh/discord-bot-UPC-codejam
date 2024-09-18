@@ -6,12 +6,34 @@ from funcs import Funcs
 
 
 class Commands:
-    def __init__(self, client):
-        self.__funcs = Funcs(client)
+    def __init__(self, client: Client, funcs: Funcs):
         self.__client = client
+        self.__funcs = funcs
+        self.__inConvo = False
+        self.__currentFunc = []
+
+    # prints all commands
+
+    async def help(self):
+        commands = {
+            '!member': 'Makes the mentioned person a member. exec role is neeeded to use this command',
+            '!spam': 'Messages all members reminded them to renew membership. used in january. exec role is needed to use this command.',
+            '!msgnonmembers': 'Messages all people in the discord who have not yet signed up (excluding industry, adelaide CSC execs) and have been in the discord for more then a week. exec role is needed to use this command.'
+
+        }
+        otherFuncions = [
+            'When a user leaves a message is sent in #activity-log containg the users name and current member count.']
+
+        txt = 'Commands:\n'
+        for key in commands:
+            txt += f'{key}: {commands[key]}\n'
+        txt += '\nOther Functions:\n'
+        for item in otherFuncions:
+            txt += f'\u2022 {item}\n'
+
+        return txt
 
     # adds role to mentioned member
-
     async def add_role(self, message: Message, roleName='member'):
         if await self.__funcs.check_for_role(message.author, 'exec') == True:
             role = utils.get(message.guild.roles, name=roleName)
@@ -75,23 +97,31 @@ class Commands:
 
         return f'{[x.name for x in nonMembers]} have all been direct messaged. - not actually code is commented out'
 
-    # prints all commands
+    async def set_event(self, message: Message):
+        # datetime_object = datetime.strptime(datetime_str, '%H:%M %d/%m/%y')
+        if message.content.startswith('!set event'):
+            self.__inConvo = True
+            self.__step = 1
+            self.__currentFunc[0] = self.set_event
+            return 'enter event date/time (h:m dd/m/yy).'
+        if self.__step == 1:
+            try:
+                self.__eventInMemoryTime = datetime.strptime(
+                    message.content, '%H:%M %d/%m/%y')
+                print(type(self.__eventInMemoryTime))
+                self.__step = 2
+                return f'Time is set at {self.__eventInMemoryTime}. Please enter the name of the event.'
+            except:
+                return f'Time was not entered correctly, please enter to the format h:m dd/m/yy.'
+        if self.__step == 2:
+            self.__eventInMemoryName = message.content
+            return f'Event has been saved in memory as {self.__eventInMemoryName}.'
 
-    async def help(self):
-        commands = {
-            '!member': 'Makes the mentioned person a member. exec role is neeeded to use this command',
-            '!spam': 'Messages all members reminded them to renew membership. used in january. exec role is needed to use this command.',
-            '!msgnonmembers': 'Messages all people in the discord who have not yet signed up (excluding industry, adelaide CSC execs) and have been in the discord for more then a week. exec role is needed to use this command.'
+    def get_inConvo(self):
+        return self.__inConvo
 
-        }
-        otherFuncions = [
-            'When a user leaves a message is sent in #activity-log containg the users name and current member count.']
+    def get_currentFunc(self):
+        return self.__currentFunc
 
-        txt = 'Commands:\n'
-        for key in commands:
-            txt += f'{key}: {commands[key]}\n'
-        txt += '\nOther Functions:\n'
-        for item in otherFuncions:
-            txt += f'\u2022 {item}\n'
-
-        return txt
+    inConvo = property(get_inConvo)
+    currentFunc = property(get_currentFunc)

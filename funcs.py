@@ -4,10 +4,10 @@ from datetime import datetime
 
 
 class Funcs:
-    def __init__(self, client):
+    def __init__(self, client: Client):
         self.__client = client
 
-        # check for specific role
+    # check for specific role
 
     async def check_for_role(self, author, roleName):
         author_roles = author.roles

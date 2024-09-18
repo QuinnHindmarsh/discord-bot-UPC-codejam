@@ -15,9 +15,9 @@ intents.members = True  # NQQA
 client: Client = Client(intents=intents)
 
 # setting up my classes
-command = Commands(client)
 funcs = Funcs(client)
-control = Control(client)
+commands = Commands(client, funcs)
+control = Control(client, commands)
 
 # called on startup
 
@@ -49,11 +49,17 @@ async def on_raw_member_remove(payload):
 
     await channel.send(f'{payload.user} has now left, there are now {memberCount} members.')
 
-#  Runs bot
+
+def give_instances():
+    commands.set_instances(funcs)
+    control.set_instances(funcs)
+
+    #  Runs bot
 
 
 def run():
     client.run(token=token)
+    give_instances()
 
 
 run()
