@@ -53,7 +53,9 @@ async def add_role(message: Message, roleName='member'):
 
 
 # messages every member - used to remined people of renewal
-async def renew():
+async def renew(message: Message):
+    if check_for_role(message.author, 'exec') == False:
+        return 'You can not use this command as you are not an executive.'
     if datetime.now().month != 1:
         return 'It is not January, you dont wanna message everyone yet'
     allUsers = client.get_all_members()
@@ -66,7 +68,9 @@ async def renew():
 
 
 # messages people who have been in the server for more then a week and dont have member or other relivent role to sign up
-async def msg_non_members():
+async def msg_non_members(message: Message):
+    if check_for_role(message.author, 'exec') == False:
+        return 'You can not use this command as you are not an executive.'
     allUsers = client.get_all_members()
     nonMembers = []
     ignoredRoles = ['member', 'Adelaide CSC exec', 'Industry', 'exec']
@@ -89,12 +93,31 @@ async def msg_non_members():
 
     return f'{[x.name for x in nonMembers]} have all been direct messaged.'
 
+# prints all commands
 
-async def test():
-    pass
 
+async def help():
+    commands = {
+        '!member': 'Makes the mentioned person a member. exec role is neeeded to use this command',
+        '!spam': 'Messages all members reminded them to renew membership. used in january. exec role is needed to use this command.',
+        '!msgnonmembers': 'Messages all people in the discord who have not yet signed up (excluding industry, adelaide CSC execs) and have been in the discord for more then a week. exec role is needed to use this command.'
+
+    }
+    otherFuncions = [
+        'When a user leaves a message is sent in #activity-log containg the users name and current member count.']
+
+    txt = ''
+    for key in commands:
+        txt += f'{key}: {commands[key]}\n'
+    txt += '\n'
+    for item in commands:
+        txt += f'\u2022 {item}\n'
+
+    return txt
 
 # finds the appropraite function to call based on the message content
+
+
 async def get_response(message: Message):
     message_content = message.content
     if message_content[0] != '!':
@@ -103,14 +126,15 @@ async def get_response(message: Message):
     if message_content.startswith('!member'):
         return await add_role(message)
     elif message_content.startswith('!spam'):
-        return await renew()
+        return await renew(message)
     elif message_content.startswith('!msgnonmembers'):
-        return await msg_non_members()
-    elif message_content.startswith('!test'):
-        return await test()
-
+        return await msg_non_members(message)
+    elif message_content.startswith('!help'):
+        return await help()
 
 # deals with recived messages
+
+
 async def send_message(message: Message) -> None:
     message_content = message.content
 
