@@ -1,7 +1,5 @@
-#   FEATURES
-#   !member @user - lets you add member role to mentioned person
-
 from discord import Intents, Client, Message, utils, Member
+import discord
 from private import token
 from responses import get_response
 from copy import deepcopy
@@ -40,7 +38,6 @@ def strip_UID(text):
 
 
 async def add_role(message: Message, roleName='member'):
-
     if await check_for_role(message.author, 'exec') == True:
         role = utils.get(message.guild.roles, name=roleName)
         UID = strip_UID(str(message.content))
@@ -72,18 +69,29 @@ async def renew():
 async def msg_non_members():
     allUsers = client.get_all_members()
     nonMembers = []
-
+    ignoredRoles = ['member', 'Adelaide CSC exec', 'Industry', 'exec']
     for user in allUsers:
-        if await check_for_role(user, 'member') == False and await check_for_role(user, 'Adelaide CSC exec') == False and await check_for_role(user, 'Industry') == False:
-            if (datetime.now() - (user.joined_at.replace(tzinfo=None))).days >= 7:
-                nonMembers.append(user)
+        flag = True
+        for item in ignoredRoles:
+            if check_for_role(user, item) == True:
+                flag = True
+            if flag == False:
+                if (datetime.now() - (user.joined_at.replace(tzinfo=None))).days >= 7:
+                    nonMembers.append(user)
 
     for user in nonMembers:
         if isinstance(user, Member):
-            channel = await user.create_dm()
-            await channel.send('Hi,\nyou have been in the UniSA programming community discord for more then a week, and still have not signed up.\nIt only takes a minute to sign up, is free and you dont need to be a UniSA student to do it. Signing up is the best way to support our club and allow us to host as many future events as possible.\nhttps://usasa.sa.edu.au/clubs/join/7520/')
+            try:
+                channel = await user.create_dm()
+                await channel.send('Hi,\nyou have been in the UniSA Open Source Community discord for more then a week, and still have not signed up.\nIt only takes a minute to sign up, is free and you dont need to be a UniSA student to do it. Signing up is the best way to support our club and allow us to host as many future events as possible.\nhttps://usasa.sa.edu.au/clubs/join/7520/')
+            except discord.errors.HTTPException:
+                print(f'{user.name} could not be messaged')
 
-    return f'{[x.name for x in nonMembers]}'
+    return f'{[x.name for x in nonMembers]} have all been direct messaged.'
+
+
+async def test():
+    pass
 
 
 # finds the appropraite function to call based on the message content
@@ -98,6 +106,8 @@ async def get_response(message: Message):
         return await renew()
     elif message_content.startswith('!msgnonmembers'):
         return await msg_non_members()
+    elif message_content.startswith('!test'):
+        return await test()
 
 
 # deals with recived messages
@@ -128,9 +138,19 @@ async def on_message(message: Message):
     await send_message(message)
 
 
+# send a message and member count each time user leaves server
 @client.event
 async def on_raw_member_remove(payload):
     print(payload)
+    print(payload.user)
+
+    channel = client.get_channel(1270268706349649940)
+    memberCount = 0
+    members = client.get_all_members()
+    for member in members:
+        memberCount += 1
+
+    await channel.send(f'{payload.user} has now left, there are now {memberCount} members.')
 
 
 #  Runs bot
