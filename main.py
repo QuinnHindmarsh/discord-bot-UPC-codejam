@@ -1,8 +1,7 @@
 from discord import Intents, Client, Message, utils, Member
 import discord
 from private import token
-from responses import get_response
-from copy import deepcopy
+
 from datetime import datetime
 
 # bot setup
@@ -106,11 +105,11 @@ async def help():
     otherFuncions = [
         'When a user leaves a message is sent in #activity-log containg the users name and current member count.']
 
-    txt = ''
+    txt = 'Commands:\n'
     for key in commands:
         txt += f'{key}: {commands[key]}\n'
-    txt += '\n'
-    for item in commands:
+    txt += '\nOther Functions:\n'
+    for item in otherFuncions:
         txt += f'\u2022 {item}\n'
 
     return txt
