@@ -7,14 +7,14 @@ from funcs import Funcs
 from commands import Commands
 from control import Control
 
-
-# bot setup
+# permision/intent setup
 intents: Intents = Intents.default()
 intents.message_content = True  # NQQA
 intents.members = True  # NQQA
 
 client: Client = Client(intents=intents)
 
+# setting up my classes
 command = Commands(client)
 funcs = Funcs(client)
 control = Control(client)
@@ -35,12 +35,11 @@ async def on_message(message: Message):
 
     await control.send_message(message)
 
-
 # send a message and member count each time user leaves server
+
+
 @client.event
 async def on_raw_member_remove(payload):
-    print(payload)
-    print(payload.user)
 
     channel = client.get_channel(1270268706349649940)
     memberCount = 0
@@ -50,10 +49,11 @@ async def on_raw_member_remove(payload):
 
     await channel.send(f'{payload.user} has now left, there are now {memberCount} members.')
 
-
 #  Runs bot
-def main():
+
+
+def run():
     client.run(token=token)
 
 
-main()
+run()
