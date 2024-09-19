@@ -37,5 +37,7 @@ class Control:
             return await self.__commands.msg_non_members(message)
         elif message_content.startswith('!help'):
             return await self.__commands.help()
-        elif message_content.startswith('!set event'):
+        elif message_content.lower().startswith('!set event'):
             return await self.__commands.set_event(message)
+        elif message_content.lower().startswith('!see events'):
+            return await self.__commands.display_events()

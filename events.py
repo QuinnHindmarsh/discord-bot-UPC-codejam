@@ -1,0 +1,1 @@
+Events = {'code jam end': '23:59 20/09/24', 'DSA workshop': '18:00 27/09/24'}

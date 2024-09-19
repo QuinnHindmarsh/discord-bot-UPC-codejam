@@ -18,7 +18,9 @@ class Commands:
         commands = {
             '!member': 'Makes the mentioned person a member. exec role is neeeded to use this command',
             '!spam': 'Messages all members reminded them to renew membership. used in january. exec role is needed to use this command.',
-            '!msgnonmembers': 'Messages all people in the discord who have not yet signed up (excluding industry, adelaide CSC execs) and have been in the discord for more then a week. exec role is needed to use this command.'
+            '!msgnonmembers': 'Messages all people in the discord who have not yet signed up (excluding industry, adelaide CSC execs) and have been in the discord for more then a week. exec role is needed to use this command.',
+            '!set event': 'Allows you to create an event with a time.',
+            '!see events': 'Displays all upcoming events.'
 
         }
         otherFuncions = [
@@ -107,7 +109,9 @@ class Commands:
         if self.__step == 1:
             try:
                 self.__eventInMemoryTime = datetime.strptime(
-                    message.content, '%H:%M %d/%m/%y')
+                    message.content, '%H:%M %d/%m/%y')  # used to check if format is correct
+                self.__eventInMemoryTimeStr = self.__eventInMemoryTime.strftime(
+                    '%H:%M %d/%m/%y')
                 self.__step = 2
                 return f'Time is set at {self.__eventInMemoryTime}. Please enter the name of the event.'
             except:
@@ -115,8 +119,21 @@ class Commands:
         if self.__step == 2:
             self.__eventInMemoryName = message.content
             self.__funcs.save_evet(
-                self.__eventInMemoryName, self.__eventInMemoryTime)
+                self.__eventInMemoryName, self.__eventInMemoryTimeStr)
+            self.__inConvo = False
+
             return f'Event has been saved in memory as {self.__eventInMemoryName}.'
+
+    async def display_events(self):
+        try:
+            from events import Events
+        except:
+            return 'There are no events currently saved, you can create a new event using !set event.'
+        txt = ''
+
+        for event_key in Events:
+            txt += f'{event_key} - {Events[event_key]}\n'
+        return txt
 
     def get_inConvo(self):
         return self.__inConvo

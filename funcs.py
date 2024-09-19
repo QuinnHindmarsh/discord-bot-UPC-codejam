@@ -36,6 +36,6 @@ class Funcs:
 
         Events[name] = time
 
-        f = open('events.py', 'w')
+        f = open('discord-bot-UPC-codejam\\events.py', 'w')
         f.write(f'Events = {Events}')
         f.close()
