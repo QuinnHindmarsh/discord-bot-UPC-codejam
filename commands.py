@@ -10,7 +10,7 @@ class Commands:
         self.__client = client
         self.__funcs = funcs
         self.__inConvo = False
-        self.__currentFunc = []
+        self.__currentFunc = False
 
     # prints all commands
 
@@ -102,19 +102,20 @@ class Commands:
         if message.content.startswith('!set event'):
             self.__inConvo = True
             self.__step = 1
-            self.__currentFunc[0] = self.set_event
+            self.__currentFunc = self.set_event
             return 'enter event date/time (h:m dd/m/yy).'
         if self.__step == 1:
             try:
                 self.__eventInMemoryTime = datetime.strptime(
                     message.content, '%H:%M %d/%m/%y')
-                print(type(self.__eventInMemoryTime))
                 self.__step = 2
                 return f'Time is set at {self.__eventInMemoryTime}. Please enter the name of the event.'
             except:
                 return f'Time was not entered correctly, please enter to the format h:m dd/m/yy.'
         if self.__step == 2:
             self.__eventInMemoryName = message.content
+            self.__funcs.save_evet(
+                self.__eventInMemoryName, self.__eventInMemoryTime)
             return f'Event has been saved in memory as {self.__eventInMemoryName}.'
 
     def get_inConvo(self):

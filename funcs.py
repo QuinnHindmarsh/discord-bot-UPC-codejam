@@ -19,7 +19,7 @@ class Funcs:
 
     # strips all text from userID+
 
-    def strip_UID(self, text):
+    def strip_UID(self, text: str):
         textToRemove = ['!member ', '<@', '>']
         UID = text
 
@@ -27,3 +27,15 @@ class Funcs:
             UID = UID.replace(item, '')
 
         return int(UID)
+
+    def save_evet(self, name: str, time: datetime):
+        try:
+            from events import Events
+        except:
+            Events = {}
+
+        Events[name] = time
+
+        f = open('events.py', 'w')
+        f.write(f'Events = {Events}')
+        f.close()

@@ -24,9 +24,8 @@ class Control:
     # finds the appropraite function to call based on the message content
     async def get_response(self, message: Message):
         message_content = message.content
-        print(self.__commands.inConvo)
         if self.__commands.inConvo == True:
-            return await self.__commands.currentFunc[0]()
+            return await self.__commands.currentFunc(message)
 
         elif message_content[0] != '!':
             return False
