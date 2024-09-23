@@ -24,7 +24,7 @@ class Control:
     # finds the appropraite function to call based on the message content
     async def get_response(self, message: Message):
         message_content = message.content
-        if self.__commands.inConvo == True:
+        if self.__commands.inConvo == True and message.author.id == self.__commands.currentUserID:
             return await self.__commands.currentFunc(message)
 
         elif message_content[0] != '!':

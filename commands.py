@@ -9,12 +9,14 @@ class Commands:
     def __init__(self, client: Client, funcs: Funcs):
         self.__client = client
         self.__funcs = funcs
+        self.__currentUserID = -1
         self.__inConvo = False
         self.__currentFunc = False
 
     # prints all commands
 
     async def help(self):
+
         commands = {
             '!member': 'Makes the mentioned person a member. exec role is neeeded to use this command',
             '!spam': 'Messages all members reminded them to renew membership. used in january. exec role is needed to use this command.',
@@ -101,8 +103,11 @@ class Commands:
 
     async def set_event(self, message: Message):
         # datetime_object = datetime.strptime(datetime_str, '%H:%M %d/%m/%y')
+        if await self.__funcs.check_for_role(message.author, 'exec') == False:
+            return 'you can not set an event as you are not a exec.'
         if message.content.startswith('!set event'):
             self.__inConvo = True
+            self.__currentUserID = message.author.id
             self.__step = 1
             self.__currentFunc = self.set_event
             return 'enter event date/time (h:m dd/m/yy).'
@@ -125,14 +130,12 @@ class Commands:
             return f'Event has been saved in memory as {self.__eventInMemoryName}.'
 
     async def display_events(self):
-        try:
-            from events import Events
-        except:
-            return 'There are no events currently saved, you can create a new event using !set event.'
-        txt = ''
+        unorderedEvents = self.__funcs.load_json()
+        orderedEvents = self.__funcs.sort_events(unorderedEvents)
 
-        for event_key in Events:
-            txt += f'{event_key} - {Events[event_key]}\n'
+        txt = ''
+        for event_key in orderedEvents:
+            txt += f'{event_key} - {orderedEvents[event_key]}\n'
         return txt
 
     def get_inConvo(self):
@@ -141,5 +144,9 @@ class Commands:
     def get_currentFunc(self):
         return self.__currentFunc
 
+    def get_currentUserID(self):
+        return self.__currentUserID
+
     inConvo = property(get_inConvo)
     currentFunc = property(get_currentFunc)
+    currentUserID = property(get_currentUserID)
