@@ -131,11 +131,11 @@ class Commands:
 
     async def display_events(self):
         unorderedEvents = self.__funcs.load_json()
-        orderedEvents = self.__funcs.sort_events(unorderedEvents)
+        eventOrder = self.__funcs.sort_events(unorderedEvents)
 
         txt = ''
-        for event_key in orderedEvents:
-            txt += f'{event_key} - {orderedEvents[event_key]}\n'
+        for item in eventOrder:
+            txt += f'{item} - {unorderedEvents[item]}\n'
         return txt
 
     def get_inConvo(self):
