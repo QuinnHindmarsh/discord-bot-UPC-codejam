@@ -23,7 +23,7 @@ class Control:
 
     # finds the appropraite function to call based on the message content
     async def get_response(self, message: Message):
-        message_content = message.content
+        message_content = message.content.lower()
         if self.__commands.inConvo == True and message.author.id == self.__commands.currentUserID:
             return await self.__commands.currentFunc(message)
 
@@ -37,7 +37,9 @@ class Control:
             return await self.__commands.msg_non_members(message)
         elif message_content.startswith('!help'):
             return await self.__commands.help()
-        elif message_content.lower().startswith('!set event'):
+        elif message_content.startswith('!set event'):
             return await self.__commands.set_event(message)
-        elif message_content.lower().startswith('!see events'):
+        elif message_content.startswith('!see events'):
             return await self.__commands.display_events()
+        elif message_content.startswith('!del event'):
+            return await self.__commands.delete_event(message)

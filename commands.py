@@ -1,7 +1,7 @@
 from discord import Intents, Client, Message, utils, Member
 import discord
 from datetime import datetime
-
+from json import dump
 from funcs import Funcs
 
 
@@ -22,11 +22,12 @@ class Commands:
             '!spam': 'Messages all members reminded them to renew membership. used in january. exec role is needed to use this command.',
             '!msgnonmembers': 'Messages all people in the discord who have not yet signed up (excluding industry, adelaide CSC execs) and have been in the discord for more then a week. exec role is needed to use this command.',
             '!set event': 'Allows you to create an event with a time.',
-            '!see events': 'Displays all upcoming events.'
+            '!see events': 'Displays all upcoming events.',
+            '!del event *event name*': 'Deletes the event',
 
         }
         otherFuncions = [
-            'When a user leaves a message is sent in #activity-log containg the users name and current member count.']
+            'When a user leaves a message is sent in #activity-log containg the users name and current member count.','Automatically does not past events']
 
         txt = 'Commands:\n'
         for key in commands:
@@ -135,8 +136,25 @@ class Commands:
 
         txt = ''
         for item in eventOrder:
-            txt += f'{item} - {unorderedEvents[item]}\n'
+            if datetime.strptime(unorderedEvents[item],'%H:%M %d/%m/%y') > datetime.now():
+                txt += f'{item} - {unorderedEvents[item]}\n'
         return txt
+    
+    async def delete_event(self,message:Message):
+        if self.__funcs.check_for_role(message.author,'exec') == False:
+            return 'you can not delete a event as you are not an exec'
+        text = message.content.split()
+        text = ' '.join(text[2::])
+
+        events = self.__funcs.load_json()
+        try:
+            events.pop(text)
+            with open("events.json", 'w') as f:
+                dump(events, f)
+            return 'Event deleted'
+        except KeyError:
+            return 'Event does not exist'
+    
 
     def get_inConvo(self):
         return self.__inConvo

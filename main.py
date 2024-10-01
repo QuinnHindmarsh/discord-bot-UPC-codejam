@@ -51,7 +51,6 @@ async def on_raw_member_remove(payload):
 
 
 def give_instances():
-    commands.set_instances(funcs)
     control.set_instances(funcs)
 
     #  Runs bot
