@@ -19,8 +19,4 @@ This bot is purly designed for the UniSA Programming Community discord server, a
 - Aync functions
 
 ![image](https://github.com/user-attachments/assets/9e13bab1-8f5a-4a22-9068-204eb43d5066)
-<p align="center">
-  <img src="![image](https://github.com/user-attachments/assets/ba08ccec-1d2c-4ba0-a803-c4275c9e64a0)
-"/>
-</p>
-
+![image](https://github.com/user-attachments/assets/6a7fc588-bff2-4cc9-b538-433893911119)
